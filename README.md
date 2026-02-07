@@ -1,4 +1,4 @@
-# <img src="./polymask-black.jpeg" width="48" height="48" valign="middle"> PolyMask (GhostMarket)
+# <img src="./polymask-black.jpeg" width="48" height="48" valign="middle"> PolyMask
 
 ### **Place private, untraceable bets on Polymarket**
 
