@@ -1,4 +1,8 @@
-# <img src="./polymask-black.jpeg" width="48" height="48" valign="middle"> PolyMask
+# PolyMask
+
+<p align="center">
+  <img src="./polymask-black.jpeg" width="480" height="480" alt="PolyMask Wolf Logo">
+</p>
 
 ### **Place private, untraceable bets on Polymarket**
 
@@ -36,7 +40,7 @@ Instead of one "Whale Wallet" that ends up on the leaderboard, PolyMask uses **A
 We use high-security **Hardware Vaults (Intel SGX)** to manage these Ghost Wallets. Even PolyMask developers cannot see which Ghost Wallet belongs to which user. The connection between your identity and your bet is completely severed inside the TEE.
 
 ### 3. Context-Aware Execution
-The Chrome Extension identifies exactly which market you are viewing and handles the fragmentation and execution in the background. You can move $1,000,000 into a market without ever appearing on a "Whale Watch" alert. **You get the retail price for institutional size.**
+The Chrome Extension identifies exactly which market you are viewing and handles the fragmentation and execution in the background. You can now move $1,000,000 into a market without ever appearing on a "Whale Watch" alert. **You get the retail price for institutional size.**
 
 ---
 
