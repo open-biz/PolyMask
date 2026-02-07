@@ -81,7 +81,7 @@ const solutionFeatures = [
     href: "#",
     cta: "View Demo",
     background: <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent" />,
-    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+    className: "lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2",
   },
   {
     Icon: RocketIcon,
@@ -90,7 +90,7 @@ const solutionFeatures = [
     href: "#",
     cta: "Pro Features",
     background: <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent" />,
-    className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
+    className: "lg:col-start-3 lg:col-end-4 lg:row-start-2 lg:row-end-4",
   },
 ];
 
