@@ -1,9 +1,45 @@
-const fs = require('fs');
-const path = require('path');
-const { ethers } = require('ethers');
-const axios = require('axios');
-const { HttpsProxyAgent } = require('https-proxy-agent');
-const { deriveGhostFleet } = require('./keyManager');
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { ethers } from 'ethers';
+import axios from 'axios';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { deriveGhostFleet } from './keyManager.js';
+import JSZip from 'jszip';
+
+/**
+ * Custom helper to read protected data from the iExec zip
+ */
+async function getProtectedData() {
+    const iexecIn = process.env.IEXEC_IN || '/iexec_in';
+    const datasetFilename = process.env.IEXEC_DATASET_FILENAME || 'protectedData.zip';
+    const filePath = path.join(iexecIn, datasetFilename);
+    
+    try {
+        const buffer = await fs.readFile(filePath);
+        const zip = await new JSZip().loadAsync(buffer);
+        
+        // DataProtector v2+ uses a nested structure or individual files
+        // We'll try to reconstruct the object from the files in the zip
+        const data = {};
+        for (const [relativePath, file] of Object.entries(zip.files)) {
+            if (!file.dir) {
+                const content = await file.async('string');
+                const key = relativePath.split('/').pop();
+                data[key] = content;
+            }
+        }
+        return data;
+    } catch (e) {
+        console.log("No protected data zip found or failed to parse, checking for fallback json");
+        const fallbackPath = path.join(iexecIn, 'protectedData.json');
+        try {
+            const raw = await fs.readFile(fallbackPath, 'utf8');
+            return JSON.parse(raw);
+        } catch (e2) {
+            return {};
+        }
+    }
+}
 
 /**
  * Resolves a Polymarket slug to technical identifiers (conditionId, tokenId)
@@ -11,8 +47,8 @@ const { deriveGhostFleet } = require('./keyManager');
 async function resolveMarket(slug, outcome, proxyUrl) {
     console.log(`Resolving market for slug: ${slug}`);
     const config = {};
-    if (proxyUrl || process.env.HTTPS_PROXY) {
-        config.httpsAgent = new HttpsProxyAgent(proxyUrl || process.env.HTTPS_PROXY);
+    if (proxyUrl) {
+        config.httpsAgent = new HttpsProxyAgent(proxyUrl);
     }
 
     try {
@@ -21,21 +57,16 @@ async function resolveMarket(slug, outcome, proxyUrl) {
         if (!market) throw new Error("Market not found");
 
         const tokenId = (outcome.toUpperCase() === 'YES') ? market.yes_token_id : market.no_token_id;
-        console.log(`Resolved: Market Name="${market.question}", TokenID=${tokenId}`);
         return { 
             tokenId, 
             conditionId: market.condition_id,
             question: market.question 
         };
     } catch (error) {
-        console.error("Market resolution failed:", error.message);
-        throw error;
+        throw new Error(`Market resolution failed: ${error.message}`);
     }
 }
 
-/**
- * Executes a single trade in the fleet
- */
 async function executeSingleTrade({ tokenId, outcome, amount, privateKey, safeAddress, useAA }) {
     const provider = new ethers.JsonRpcProvider('https://polygon-rpc.com');
     const ghostSigner = new ethers.Wallet(privateKey, provider);
@@ -71,136 +102,93 @@ async function executeSingleTrade({ tokenId, outcome, amount, privateKey, safeAd
     const amountInWei = ethers.parseUnits(amount.toString(), 6);
 
     const order = {
-        salt: salt,
+        salt,
         maker: makerAddress,
         signer: await ghostSigner.getAddress(),
         taker: "0x0000000000000000000000000000000000000000",
-        tokenId: tokenId,
+        tokenId,
         makerAmount: amountInWei.toString(),
         takerAmount: "0", 
-        expiration: expiration,
+        expiration,
         nonce: 0, 
         feeRateBps: 0,
-        side: side,
+        side,
         signatureType: useAA ? 2 : 0, 
     };
 
-    const signature = await ghostSigner.signTypedData(domain, types, order);
-    console.log(`[Ghost] Order signed for Vault ${makerAddress} using Ghost ${await ghostSigner.getAddress()}`);
-    
+    await ghostSigner.signTypedData(domain, types, order);
     return { status: "success", maker: makerAddress, salt };
 }
 
-/**
- * Polymarket CLOB Trade Logic with Ghost Fleet Fragmentation
- */
-async function placeOrder({ marketId, outcome, amount, privateKey, proxyUrl, marketSlug, safeAddress, useAA, fleetSize = 1, masterSeed, userAddress }) {
-    // 0. Resolve Market
-    let tokenId = marketId;
-    if (marketSlug) {
-        const resolved = await resolveMarket(marketSlug, outcome, proxyUrl);
-        tokenId = resolved.tokenId;
-    }
+const main = async () => {
+    const { IEXEC_OUT, IEXEC_APP_SECRET_0, IEXEC_APP_SECRET_1 } = process.env;
+    console.log("PolyMask Ghost Fleet Worker Starting...");
 
-    // 1. Derive Fleet
-    console.log(`Deploying Ghost Fleet of size: ${fleetSize}`);
-    const fleetKeys = deriveGhostFleet(masterSeed || "dev-seed", userAddress || "0x0", fleetSize);
-    
-    // 2. Split Amount
-    const amountPerShip = (parseFloat(amount) / fleetSize).toFixed(6);
-    console.log(`Fragmenting ${amount} USDC into ${fleetSize} trades of ${amountPerShip} USDC each.`);
-
-    // 3. Execute Fleet
-    const results = [];
-    for (const key of fleetKeys) {
-        // In a real AA setup, safeAddress would also be unique per key if we want true fragmentation
-        // For this demo, we can either use the same Safe or derive unique Safes
-        const result = await executeSingleTrade({
-            tokenId,
-            outcome,
-            amount: amountPerShip,
-            privateKey: key,
-            safeAddress,
-            useAA
-        });
-        results.push(result);
-    }
-
-    return { 
-        status: "fleet-success", 
-        fleetSize, 
-        totalAmount: amount, 
-        trades: results 
-    };
-}
-
-async function main() {
-    const iexecIn = process.env.IEXEC_IN || '/iexec_in';
-    const iexecOut = process.env.IEXEC_OUT || '/iexec_out';
-    const inputPath = path.join(iexecIn, 'protectedData.json'); // Changed from .zip to .json for simplicity in this example
-
-    let inputData;
     try {
-        if (fs.existsSync(inputPath)) {
-            const rawData = fs.readFileSync(inputPath);
-            inputData = JSON.parse(rawData);
-            console.log("Loaded protected data from", inputPath);
-        } else {
-            console.log("No protected data found at", inputPath, "- using env vars for local testing");
-            inputData = {
-                marketId: process.env.MARKET_ID,
-                amount: process.env.AMOUNT,
-                outcome: process.env.OUTCOME
-            };
+        // 1. Get Input Data
+        const inputData = await getProtectedData();
+        
+        const marketId = inputData.marketId;
+        const marketSlug = inputData.marketSlug;
+        const outcome = inputData.outcome || "YES";
+        const amount = inputData.amount || "1.0";
+        const safeAddress = inputData.safeAddress;
+        const useAA = inputData.useAA === "true" || inputData.useAA === true;
+        const fleetSize = parseInt(inputData.fleetSize || "1");
+        const userAddress = inputData.userAddress || "0x0000000000000000000000000000000000000000";
+
+        // 2. Resolve Secrets
+        const masterSeed = IEXEC_APP_SECRET_1 || "local-dev-seed";
+        const proxyUrl = process.env.PROXY_URL;
+
+        // 3. Resolve Market
+        let tokenId = marketId;
+        if (marketSlug) {
+            const resolved = await resolveMarket(marketSlug, outcome, proxyUrl);
+            tokenId = resolved.tokenId;
         }
-    } catch (e) {
-        console.error("Error reading input data:", e);
-        process.exit(1);
-    }
 
-    const masterSeed = process.env.IEXEC_APP_SECRET_1 || "local-dev-seed";
-    const userAddress = inputData.userAddress || "0x0000000000000000000000000000000000000000";
+        // 4. Derive Fleet & Execute
+        console.log(`Deploying Ghost Fleet of size: ${fleetSize}`);
+        const fleetKeys = deriveGhostFleet(masterSeed, userAddress, fleetSize);
+        
+        const amountPerShip = (parseFloat(amount) / fleetSize).toFixed(6);
 
-    let privateKey;
-    if (process.env.IEXEC_APP_SECRET_0) {
-        // Option A: Use a direct secret injected by SMS
-        privateKey = process.env.IEXEC_APP_SECRET_0;
-    } else {
-        // Option B: Derive the Ghost Wallet for this user
-        console.log(`Deriving Ghost Wallet for user: ${userAddress}`);
-        const ghostWallet = deriveGhostWallet(masterSeed, userAddress);
-        privateKey = ghostWallet.privateKey;
-    }
+        const results = [];
+        for (const key of fleetKeys) {
+            const result = await executeSingleTrade({
+                tokenId,
+                outcome,
+                amount: amountPerShip,
+                privateKey: key,
+                safeAddress,
+                useAA
+            });
+            results.push(result);
+        }
 
-    if (!inputData.marketId || !inputData.outcome || !inputData.amount || !privateKey) {
-        console.error("Missing required inputs (marketId, outcome, amount, or privateKey)");
-        process.exit(1);
-    }
+        const finalResult = { 
+            status: "fleet-success", 
+            fleetSize, 
+            totalAmount: amount, 
+            trades: results 
+        };
 
-    try {
-        const result = await placeOrder({
-            marketId: inputData.marketId,
-            marketSlug: inputData.marketSlug,
-            outcome: inputData.outcome,
-            amount: inputData.amount,
-            privateKey: privateKey,
-            safeAddress: inputData.safeAddress,
-            useAA: inputData.useAA,
-            fleetSize: inputData.fleetSize || 1,
-            masterSeed: masterSeed,
-            userAddress: userAddress
-        });
-
-        // Write results for iExec
-        fs.writeFileSync(path.join(iexecOut, 'result.json'), JSON.stringify(result));
-        fs.writeFileSync(path.join(iexecOut, 'computed.json'), JSON.stringify({
-            "deterministic-output-path": path.join(iexecOut, 'result.json')
+        // 5. Save Output
+        await fs.writeFile(`${IEXEC_OUT}/result.json`, JSON.stringify(finalResult));
+        await fs.writeFile(`${IEXEC_OUT}/computed.json`, JSON.stringify({
+            'deterministic-output-path': `${IEXEC_OUT}/result.json`,
         }));
-        console.log("Results written to", iexecOut);
-    } catch (err) {
-        console.error("Trade failed:", err);
+        console.log("PolyMask execution complete.");
+
+    } catch (e) {
+        console.error("PolyMask Error:", e);
+        await fs.writeFile(`${IEXEC_OUT}/computed.json`, JSON.stringify({
+            'deterministic-output-path': IEXEC_OUT,
+            'error-message': e.message,
+        }));
         process.exit(1);
     }
-}
+};
 
 main();

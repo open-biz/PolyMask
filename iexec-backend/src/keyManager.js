@@ -1,4 +1,4 @@
-const { ethers } = require('ethers');
+import { ethers } from 'ethers';
 
 /**
  * Deterministically derives a "Ghost Fleet" of keys from a master seed.
@@ -8,7 +8,7 @@ const { ethers } = require('ethers');
  * @param {number} count - Number of keys to derive in the fleet
  * @returns {string[]} Array of private keys
  */
-function deriveGhostFleet(masterSeed, userAddress, count = 1) {
+export function deriveGhostFleet(masterSeed, userAddress, count = 1) {
     if (!masterSeed) throw new Error("Master seed is required");
     if (!userAddress) throw new Error("User address is required");
 
@@ -28,5 +28,3 @@ function deriveGhostFleet(masterSeed, userAddress, count = 1) {
     
     return fleet;
 }
-
-module.exports = { deriveGhostFleet };

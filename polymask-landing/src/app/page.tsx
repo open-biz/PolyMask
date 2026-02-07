@@ -1,7 +1,13 @@
+'use client';
+
 import Image from "next/image";
 import { Shield, Zap, Lock, EyeOff, Cpu, Globe, ArrowRight, Download, Eye, TrendingUp, UserCheck } from "lucide-react";
+import { useAccount, useChainId } from "wagmi";
 
 export default function Home() {
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+
   return (
     <div className="min-h-screen bg-black text-white selection:bg-blue-500/30 font-sans">
       {/* Navigation */}
@@ -18,10 +24,9 @@ export default function Home() {
             <a href="#features" className="hover:text-white transition-colors">Solution</a>
             <a href="#value" className="hover:text-white transition-colors">Value</a>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2">
-            <Download size={16} />
-            Install VPN for Wallet
-          </button>
+          <div className="flex items-center gap-4">
+             <appkit-button />
+          </div>
         </div>
       </nav>
 
