@@ -2,12 +2,8 @@
 
 import Image from "next/image";
 import { Shield, Zap, Lock, EyeOff, Cpu, Globe, ArrowRight, Download, Eye, TrendingUp, UserCheck } from "lucide-react";
-import { useAccount, useChainId } from "wagmi";
 
 export default function Home() {
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
-
   return (
     <div className="min-h-screen bg-black text-white selection:bg-blue-500/30 font-sans">
       {/* Navigation */}
@@ -25,7 +21,14 @@ export default function Home() {
             <a href="#value" className="hover:text-white transition-colors">Value</a>
           </div>
           <div className="flex items-center gap-4">
-             <appkit-button />
+             <a 
+               href="https://github.com/open-biz/PolyMask/tree/main/polymask-extension" 
+               target="_blank" 
+               className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2"
+             >
+                <Download size={16} />
+                Install Dev Beta
+             </a>
           </div>
         </div>
       </nav>
@@ -43,12 +46,16 @@ export default function Home() {
             "PolyMask is like a VPN for your wallet, allowing you to bet on Polymarket without the world knowing."
           </p>
           <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-            <button className="w-full md:w-auto bg-white text-black px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-2 group">
-              Shield Your First Bet <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="w-full md:w-auto bg-white/5 border border-white/10 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all">
-              View Strategy
-            </button>
+            <a 
+              href="https://github.com/open-biz/PolyMask/tree/main/polymask-extension"
+              target="_blank"
+              className="w-full md:w-auto bg-white text-black px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-2 group"
+            >
+              Get Extension Beta <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            </a>
+            <div className="px-6 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-mono">
+              Status: Developer Preview (v1.0.0-beta)
+            </div>
           </div>
         </section>
 
