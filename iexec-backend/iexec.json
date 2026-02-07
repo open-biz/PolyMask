@@ -1,0 +1,14 @@
+{
+    "app": {
+        "name": "PolyMask-Worker",
+        "type": "DOCKER",
+        "multiaddr": "registry.hub.docker.com/your-username/polymask-worker:latest",
+        "checksum": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "mrenclave": {
+            "framework": "SCONE",
+            "version": "v5",
+            "heapSize": 1073741824,
+            "fingerprint": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+    }
+}

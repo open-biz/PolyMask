@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "PolyMask",
+  "version": "1.0.0",
+  "description": "Privacy-preserving Ghost Market interface for Polymarket.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://polymarket.com/*"],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://polymarket.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "128": "logo.jpeg"
+  }
+}
