@@ -1,6 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  --logo-opacity: 0.15;
+}
+
 body {
   background: black;
   color: white;
+}
+
+.subtle-bg-logo {
+  opacity: var(--logo-opacity);
+  pointer-events: none;
+  z-index: 0;
+  filter: grayscale(100%) brightness(0.5);
 }

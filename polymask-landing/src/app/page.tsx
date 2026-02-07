@@ -60,25 +60,31 @@ export default function Home() {
         </section>
 
         {/* The Problem Section */}
-        <section id="problem" className="max-w-7xl mx-auto px-6 mb-32 border-y border-white/5 py-20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
-                <div>
-                    <h2 className="text-3xl font-bold mb-6 text-red-500 flex items-center gap-2">
-                        <Eye size={32} /> The Problem
-                    </h2>
-                    <div className="space-y-8">
-                        <div>
-                            <h3 className="text-xl font-bold mb-2">Identity Exposure</h3>
-                            <p className="text-gray-400">Every bet is permanently linked to your wallet. ENS names and Twitter profiles make your private opinions public data. Doxxed to your boss, family, and the public.</p>
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold mb-2">Strategy Theft</h3>
-                            <p className="text-gray-400">Bots watch "Whale" wallets 24/7. The moment a pro like "Fredi9999" moves, the market is front-run, stealing your profit margin.</p>
-                        </div>
+        <section id="problem" className="max-w-7xl mx-auto px-6 mb-32">
+            <h2 className="text-3xl font-bold mb-12 text-red-500 flex items-center gap-2">
+                <Eye size={32} /> The Problem
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[240px]">
+                {/* Large Box: Identity Exposure */}
+                <div className="md:col-span-2 md:row-span-1 rounded-3xl bg-red-500/5 border border-red-500/10 p-8 flex flex-col justify-center">
+                    <h3 className="text-2xl font-bold mb-3 text-red-400">Identity Exposure</h3>
+                    <p className="text-gray-400">
+                        Polymarket bets are permanently linked to your wallet. ENS names and Twitter profiles make your private opinions public data, doxxing you to your boss, family, and the world.
+                    </p>
+                </div>
+
+                {/* Small Box: Strategy Theft */}
+                <div className="rounded-3xl bg-red-500/5 border border-red-500/10 p-8 flex flex-col justify-between">
+                    <TrendingUp className="text-red-500" size={32} />
+                    <div>
+                        <h3 className="text-xl font-bold mb-1 text-red-400">Strategy Theft</h3>
+                        <p className="text-gray-400 text-sm">Bots watch whale wallets 24/7 to copy trades instantly.</p>
                     </div>
                 </div>
-                <div className="bg-red-500/5 border border-red-500/10 rounded-3xl p-8 flex items-center justify-center italic text-red-400/80 text-lg">
-                    "In traditional finance, hedge funds guard their trades with extreme secrecy. On Polymarket, traders are forced to live on the leaderboard."
+
+                {/* Quote Box */}
+                <div className="md:col-span-3 rounded-3xl bg-gradient-to-r from-red-950/20 to-black border border-red-500/10 p-8 flex items-center justify-center italic text-red-400/80 text-xl text-center">
+                    "In traditional finance, hedge funds guard their trades with extreme secrecy. <br className="hidden md:block" /> On Polymarket, traders are forced to live on the leaderboard."
                 </div>
             </div>
         </section>
