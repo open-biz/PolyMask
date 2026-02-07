@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --logo-opacity: 0.15;
+  --logo-opacity: 0.35;
 }
 
 body {
@@ -14,4 +14,34 @@ body {
   pointer-events: none;
   z-index: 0;
   filter: grayscale(100%) brightness(0.5);
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration) linear infinite;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+
+.reverse {
+  animation-direction: reverse;
 }

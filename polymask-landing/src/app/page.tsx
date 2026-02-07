@@ -1,11 +1,110 @@
 'use client';
 
 import Image from "next/image";
-import { Shield, Zap, Lock, EyeOff, Cpu, Globe, ArrowRight, Download, Eye, TrendingUp, UserCheck } from "lucide-react";
+import { 
+  Shield, 
+  Zap, 
+  Lock, 
+  EyeOff, 
+  Cpu, 
+  Globe, 
+  ArrowRight, 
+  Download, 
+  Eye, 
+  TrendingUp, 
+  UserCheck 
+} from "lucide-react";
+import { 
+  GlobeIcon, 
+  LockClosedIcon, 
+  EyeNoneIcon, 
+  RocketIcon,
+  Cross1Icon
+} from "@radix-ui/react-icons";
+import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
+import { ClientTweetCard } from "@/components/magicui/tweet-card";
+import Marquee from "@/components/magicui/marquee";
+
+const problemFeatures = [
+  {
+    Icon: EyeNoneIcon,
+    name: "Identity Exposure",
+    description: "Your political and social views are public data, doxxed to your boss, family, and the world.",
+    href: "#",
+    cta: "Learn more",
+    background: <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent" />,
+    className: "lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+  },
+  {
+    Icon: Cross1Icon,
+    name: "Strategy Theft",
+    description: "Bots watch whale wallets 24/7 to copy trades instantly.",
+    href: "#",
+    cta: "Learn more",
+    background: <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent" />,
+    className: "lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2",
+  },
+];
+
+const solutionFeatures = [
+  {
+    Icon: Shield,
+    name: "Ghost Wallets (AA)",
+    description: "Fragments your position into retail-sized smart accounts. You look like 100 random people.",
+    href: "https://github.com/open-biz/PolyMask/tree/main/polymask-extension",
+    cta: "Install Beta",
+    background: <Image src="/logo.jpeg" alt="Wolf" fill className="absolute inset-0 object-cover opacity-10 grayscale" />,
+    className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
+  },
+  {
+    Icon: Cpu,
+    name: "Digital Vault",
+    description: "Managed by Intel SGX hardware. Even we can't see your trades.",
+    href: "#",
+    cta: "Security Docs",
+    background: <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent" />,
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
+  },
+  {
+    Icon: GlobeIcon,
+    name: "Stealth Execution",
+    description: "Move millions without ever triggering a Whale Watch alert.",
+    href: "#",
+    cta: "How it works",
+    background: <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent" />,
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
+  },
+  {
+    Icon: LockClosedIcon,
+    name: "Context-Aware",
+    description: "Extension reacts to your browsing. One click to shield intent.",
+    href: "#",
+    cta: "View Demo",
+    background: <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent" />,
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+  },
+  {
+    Icon: RocketIcon,
+    name: "Alpha Protection",
+    description: "Prevent copy-trading bots from eating your margin.",
+    href: "#",
+    cta: "Pro Features",
+    background: <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent" />,
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
+  },
+];
+
+const tweetIds = [
+    "2019711375694500256", 
+    "2018267215817052217", 
+    "2019821507774382571", 
+    "1995139510607434234", 
+    "2020197578134942153"
+];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-blue-500/30 font-sans">
+    <div className="min-h-screen bg-black text-white selection:bg-blue-500/30 font-sans overflow-x-hidden">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-black/50 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -13,12 +112,12 @@ export default function Home() {
             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-blue-500/50">
               <Image src="/logo.jpeg" alt="PolyMask Logo" fill className="object-cover" />
             </div>
-            <span className="font-bold text-xl tracking-tight">PolyMask</span>
+            <span className="font-bold text-xl tracking-tight text-white">PolyMask</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
             <a href="#problem" className="hover:text-white transition-colors">The Problem</a>
             <a href="#features" className="hover:text-white transition-colors">Solution</a>
-            <a href="#value" className="hover:text-white transition-colors">Value</a>
+            <a href="#users" className="hover:text-white transition-colors">Our Users</a>
           </div>
           <div className="flex items-center gap-4">
              <a 
@@ -33,9 +132,15 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="pt-32 pb-20">
+      <main className="pt-32 pb-20 relative">
+        {/* Subtle Background Logo */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] subtle-bg-logo select-none">
+          <Image src="/logo.jpeg" alt="" fill className="object-contain" priority />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/20 to-black" />
+        </div>
+
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-6 mb-32 text-center">
+        <section className="max-w-7xl mx-auto px-6 mb-32 text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-8 uppercase tracking-widest">
             🛡️ Polymarket Alpha Protection
           </div>
@@ -60,104 +165,52 @@ export default function Home() {
         </section>
 
         {/* The Problem Section */}
-        <section id="problem" className="max-w-7xl mx-auto px-6 mb-32">
+        <section id="problem" className="max-w-7xl mx-auto px-6 mb-32 relative z-10">
             <h2 className="text-3xl font-bold mb-12 text-red-500 flex items-center gap-2">
                 <Eye size={32} /> The Problem
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[240px]">
-                {/* Large Box: Identity Exposure */}
-                <div className="md:col-span-2 md:row-span-1 rounded-3xl bg-red-500/5 border border-red-500/10 p-8 flex flex-col justify-center">
-                    <h3 className="text-2xl font-bold mb-3 text-red-400">Identity Exposure</h3>
-                    <p className="text-gray-400">
-                        Polymarket bets are permanently linked to your wallet. ENS names and Twitter profiles make your private opinions public data, doxxing you to your boss, family, and the world.
-                    </p>
-                </div>
-
-                {/* Small Box: Strategy Theft */}
-                <div className="rounded-3xl bg-red-500/5 border border-red-500/10 p-8 flex flex-col justify-between">
-                    <TrendingUp className="text-red-500" size={32} />
-                    <div>
-                        <h3 className="text-xl font-bold mb-1 text-red-400">Strategy Theft</h3>
-                        <p className="text-gray-400 text-sm">Bots watch whale wallets 24/7 to copy trades instantly.</p>
-                    </div>
-                </div>
-
-                {/* Quote Box */}
-                <div className="md:col-span-3 rounded-3xl bg-gradient-to-r from-red-950/20 to-black border border-red-500/10 p-8 flex items-center justify-center italic text-red-400/80 text-xl text-center">
-                    "In traditional finance, hedge funds guard their trades with extreme secrecy. <br className="hidden md:block" /> On Polymarket, traders are forced to live on the leaderboard."
-                </div>
+            <BentoGrid className="lg:grid-rows-1">
+              {problemFeatures.map((feature) => (
+                <BentoCard key={feature.name} {...feature} />
+              ))}
+            </BentoGrid>
+            <div className="mt-4 rounded-xl bg-gradient-to-r from-red-950/20 to-black border border-red-500/10 p-8 flex items-center justify-center italic text-red-400/80 text-lg text-center font-medium">
+                "In traditional finance, hedge funds guard their trades with extreme secrecy. <br className="hidden md:block" /> On Polymarket, traders are forced to live on the leaderboard."
             </div>
         </section>
 
-        {/* Bento Box Solution */}
-        <section id="features" className="max-w-7xl mx-auto px-6 mb-32">
-          <h2 className="text-3xl font-bold mb-12 text-blue-500">The PolyMask Solution</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[240px]">
-            <div className="md:col-span-2 md:row-span-2 rounded-3xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-white/10 p-8 flex flex-col justify-end relative overflow-hidden group">
-              <div className="absolute top-10 right-10 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Image src="/logo.jpeg" alt="Wolf" width={400} height={400} />
-              </div>
-              <Shield className="text-blue-500 mb-4" size={40} />
-              <h3 className="text-3xl font-bold mb-2">Ghost Wallets (AA)</h3>
-              <p className="text-gray-400 max-w-md">
-                Fragments your "Whale" position into a fleet of retail-sized smart accounts. To the leaderboard, you look like 100 random people.
-              </p>
-            </div>
-
-            <div className="rounded-3xl bg-white/5 border border-white/10 p-8 flex flex-col justify-between hover:bg-white/10 transition-all">
-              <Cpu className="text-blue-400" size={32} />
-              <div>
-                <h3 className="text-xl font-bold mb-1">Digital Vault</h3>
-                <p className="text-gray-400 text-sm">Managed by Intel SGX hardware. Even we can't see which Ghost Wallet belongs to you.</p>
-              </div>
-            </div>
-
-            <div className="rounded-3xl bg-white/5 border border-white/10 p-8 flex flex-col justify-between hover:bg-white/10 transition-all">
-              <EyeOff className="text-purple-500" size={32} />
-              <div>
-                <h3 className="text-xl font-bold mb-1">Context-Aware</h3>
-                <p className="text-gray-400 text-sm">Chrome Extension reacts to your browsing. One click to shield any market intent.</p>
-              </div>
-            </div>
-
-            <div className="md:col-span-1 rounded-3xl bg-white/5 border border-white/10 p-8 flex flex-col justify-between hover:bg-white/10 transition-all">
-              <Globe className="text-orange-500" size={32} />
-              <div>
-                <h3 className="text-xl font-bold mb-1">Stealth Execution</h3>
-                <p className="text-gray-400 text-sm">Move millions without ever triggering a Whale Watch alert.</p>
-              </div>
-            </div>
-
-            <div className="md:col-span-2 rounded-3xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-white/10 p-8 flex items-center gap-8">
-              <div className="bg-blue-500/20 p-4 rounded-2xl">
-                <TrendingUp size={48} className="text-blue-400" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-2">Alpha Protection</h3>
-                <p className="text-gray-400">Prevent copy-trading bots from eating your margin. Get the retail price for institutional-grade bets.</p>
-              </div>
-            </div>
-          </div>
+        {/* The Solution Section */}
+        <section id="features" className="max-w-7xl mx-auto px-6 mb-32 relative z-10">
+          <h2 className="text-3xl font-bold mb-12 text-blue-500 flex items-center gap-2">
+            <Shield size={32} /> The Solution
+          </h2>
+          <BentoGrid className="lg:grid-rows-3">
+            {solutionFeatures.map((feature) => (
+              <BentoCard key={feature.name} {...feature} />
+            ))}
+          </BentoGrid>
         </section>
 
-        {/* Business Value */}
-        <section id="value" className="max-w-7xl mx-auto px-6 mb-32">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="p-8 rounded-3xl bg-blue-500/5 border border-blue-500/10">
-                    <UserCheck className="text-blue-400 mb-4" />
-                    <h4 className="font-bold mb-2">For Everyday Users</h4>
-                    <p className="text-sm text-gray-400">Total Financial Privacy. Bet on anything without your history being doxxed.</p>
-                </div>
-                <div className="p-8 rounded-3xl bg-purple-500/5 border border-purple-500/10">
-                    <TrendingUp className="text-purple-400 mb-4" />
-                    <h4 className="font-bold mb-2">For Professionals</h4>
-                    <p className="text-sm text-gray-400">Hide strategy and size. fragmented bets ensure the best possible execution price.</p>
-                </div>
-                <div className="p-8 rounded-3xl bg-orange-500/5 border border-orange-500/10">
-                    <Zap className="text-orange-400 mb-4" />
-                    <h4 className="font-bold mb-2">VPN Experience</h4>
-                    <p className="text-sm text-gray-400">Turn it on, browse, and shield. No complex steps or new platforms to learn.</p>
-                </div>
+        {/* Our Users Section */}
+        <section id="users" className="max-w-full px-6 mb-32 relative z-10 overflow-hidden">
+            <div className="max-w-7xl mx-auto mb-12">
+                <h2 className="text-3xl font-bold text-purple-500 flex items-center gap-2">
+                    <UserCheck size={32} /> Our Users
+                </h2>
+                <p className="text-gray-400 mt-2">See why top traders and privacy advocates are joining the Ghost Fleet.</p>
+            </div>
+            
+            <div className="relative flex flex-col items-center justify-center overflow-hidden py-10">
+                <Marquee pauseOnHover className="[--duration:30s]">
+                    {tweetIds.map((id) => (
+                        <div key={id} className="w-[350px]">
+                            <ClientTweetCard id={id} className="border border-white/10 shadow-2xl" />
+                        </div>
+                    ))}
+                </Marquee>
+                {/* Gradient Overlays */}
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black"></div>
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black"></div>
             </div>
         </section>
       </main>
@@ -171,10 +224,10 @@ export default function Home() {
             PolyMask
           </div>
           <p>© 2026 PolyMask. Bringing Wall Street privacy to Polymarket.</p>
-          <div className="flex gap-8">
-            <a href="#" className="hover:text-white">GitHub</a>
-            <a href="#" className="hover:text-white">Twitter</a>
-            <a href="#" className="hover:text-white">iExec Hub</a>
+          <div className="flex gap-8 font-medium">
+            <a href="https://github.com/open-biz/polymask" className="hover:text-white transition-colors">GitHub</a>
+            <a href="#" className="hover:text-white transition-colors">Twitter</a>
+            <a href="https://iex.ec" className="hover:text-white transition-colors">iExec Hub</a>
           </div>
         </div>
       </footer>
